@@ -5,8 +5,6 @@ Created on Mon Apr 15 12:18:33 2024
 @author: Prins
 """
 
-
-
 import numpy as np
 from scipy import io
 import matplotlib.pyplot as plt
@@ -23,7 +21,7 @@ from scipy.ndimage import gaussian_filter1d
 from matplotlib.colors import ListedColormap
 import matplotlib.gridspec as gridspec
 import pandas as pd
-os.chdir('C:/Users/Prins/OneDrive - Delft University of Technology/Desktop/Master_Thesis/Scripts')
+os.chdir('C:\Users\katin\MUDE\MDP_CostaRica\Code_meye\CC_method') #I think this is where I should put in my script location?
 from CreationTime import StartTime
 
 
@@ -164,11 +162,14 @@ def Shoreline_EntropySaturation(stack):
 #%%
 if __name__ == "__main__":
     
-    beach = 'SW'
-    stack_name = 'SW_20231114_0850_GX050084.npy'
+    beach = 'SW' #should I change this?????
+    stack_name = 'test.npy'
+    
+    # 'SW_20231114_0850_GX050084.npy'
     
     
-    stack_dir = 'C:/Users/Prins/OneDrive - Delft University of Technology/Desktop/Master_Thesis/Processed/Timestacks'
+    stack_dir = "C:\Users\katin\OneDrive - Delft University of Technology\MDP\Code_Meye\processed\timestacks"
+    # 'C:/Users/Prins/OneDrive - Delft University of Technology/Desktop/Master_Thesis/Processed/Timestacks'
     timestack = np.load(os.path.join(stack_dir, beach, stack_name))
 
     # Plot entire timestack to choose appropriate window
