@@ -163,12 +163,12 @@ def Shoreline_EntropySaturation(stack):
 if __name__ == "__main__":
     
     beach = 'SW' #should I change this?????
-    stack_name = 'test.npy'
+    stack_name = 'timestack.npy'
     
     # 'SW_20231114_0850_GX050084.npy'
     
     
-    stack_dir = "C:\Users\katin\OneDrive - Delft University of Technology\MDP\Code_Meye\processed\timestacks"
+    stack_dir = "C:\Users\katin\MUDE\MDP_CostaRica\Code_meye\processed\timestacks"
     # 'C:/Users/Prins/OneDrive - Delft University of Technology/Desktop/Master_Thesis/Processed/Timestacks'
     timestack = np.load(os.path.join(stack_dir, beach, stack_name))
 
@@ -190,7 +190,8 @@ if __name__ == "__main__":
 
     
     case = 'Normalized_entropysaturation'
-    save_dir = 'C:/Users/Prins/OneDrive - Delft University of Technology/Desktop/Master_Thesis/Processed/Runup_FromEntropy/Normalize_col'
+    save_dir = "C:\Users\katin\OneDrive - Delft University of Technology\MDP\Code_Meye\processed\runup_from_entropy\normalize_col"
+    # 'C:/Users/Prins/OneDrive - Delft University of Technology/Desktop/Master_Thesis/Processed/Runup_FromEntropy/Normalize_col'
 
     
     #%%
@@ -215,7 +216,8 @@ if __name__ == "__main__":
     for stack in stacks_dict:
         
         bounds = stacks_dict.get(stack)
-        stack_dir = 'C:/Users/Prins/OneDrive - Delft University of Technology/Desktop/Master_Thesis/Processed/Timestacks'
+        stack_dir = "C:\Users\katin\OneDrive - Delft University of Technology\MDP\Code_Meye\processed\timestacks"
+        # 'C:/Users/Prins/OneDrive - Delft University of Technology/Desktop/Master_Thesis/Processed/Timestacks'
         beach = stack[:2]
         day = stack[3:11]
         timestack = np.load(os.path.join(stack_dir, beach, stack))
