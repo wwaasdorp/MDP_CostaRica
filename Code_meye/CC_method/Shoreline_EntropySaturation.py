@@ -4,9 +4,15 @@ Created on Mon Apr 15 12:18:33 2024
 
 @author: Prins
 """
+#here I want to clear all my variables
+# del var_name
+
+
+print("Hello World")
 
 import numpy as np
 from scipy import io
+from deprecated import deprecated
 import matplotlib.pyplot as plt
 import os
 from datetime import datetime, timedelta
@@ -21,8 +27,8 @@ from scipy.ndimage import gaussian_filter1d
 from matplotlib.colors import ListedColormap
 import matplotlib.gridspec as gridspec
 import pandas as pd
-os.chdir('C:\Users\katin\MUDE\MDP_CostaRica\Code_meye\CC_method') #I think this is where I should put in my script location?
-from CreationTime import StartTime
+os.chdir(r'C:\Users\katin\MUDE\MDP_CostaRica\Code_meye') #I think this is where I should put in my script location?
+# from CreationTime import StartTime
 
 
 def compute_shoreline_over_windows(reduced_timestack, window_sizes):
@@ -162,65 +168,96 @@ def Shoreline_EntropySaturation(stack):
 #%%
 if __name__ == "__main__":
     
-    beach = 'SW' #should I change this?????
-    stack_name = 'timestack.npy'
+    beach = 'SW' #should I change this??????????
+    stack_name = 'timestack_0410_101.npy'
     
     # 'SW_20231114_0850_GX050084.npy'
     
     
-    stack_dir = "C:\Users\katin\MUDE\MDP_CostaRica\Code_meye\processed\timestacks"
+    stack_dir = r"C:\Users\katin\MUDE\MDP_CostaRica\Code_meye\processed\timestacks"
     # 'C:/Users/Prins/OneDrive - Delft University of Technology/Desktop/Master_Thesis/Processed/Timestacks'
-    timestack = np.load(os.path.join(stack_dir, beach, stack_name))
+    # timestack = np.load(os.path.join(stack_dir, beach, stack_name))
+    timestack = np.load(os.path.join(stack_dir, stack_name))
+
 
     # Plot entire timestack to choose appropriate window
     plt.figure(figsize=(10,6))
     plt.imshow(timestack)
 
+    plt.savefig('output_figure.png')  # Save the figure as a PNG file
 
+    
     #%%
 
     # Choose window for processing
-    timestack_window = timestack[2500:7000]
+    # timestack_window = timestack[2500:7000]
+    timestack_window = timestack[120:300] #window in SPACE not time
+    print(timestack_window.shape[0]) 
+    print(timestack_window.shape[1])
     n = 10  # Reduction factor for the first axis
-    height = timestack_window.shape[0] // n
-    width = timestack_window.shape[1]
+    height = timestack_window.shape[0] // n #space
+    width = timestack_window.shape[1]  #time
     reshaped = timestack_window.reshape(height, n, width, timestack_window.shape[2])
     reduced_timestack = np.mean(reshaped, axis=1).astype(np.uint8)
     #%%
 
     
     case = 'Normalized_entropysaturation'
-    save_dir = "C:\Users\katin\OneDrive - Delft University of Technology\MDP\Code_Meye\processed\runup_from_entropy\normalize_col"
+    save_dir = r"C:\Users\katin\MUDE\MDP_CostaRica\Code_meye\processed\runup_from_entropy\normalize_col"
     # 'C:/Users/Prins/OneDrive - Delft University of Technology/Desktop/Master_Thesis/Processed/Runup_FromEntropy/Normalize_col'
 
     
     #%%
     
-    shoreline = compute_shoreline_over_windows(reduced_timestack, [500])
+    shoreline = compute_shoreline_over_windows(reduced_timestack, [100]) #for this test I changed the window size to 100 instead of 500
     
     #%%
-    np.save(save_dir + '/shoreline_entropysaturation_w500_' + case + '.npy', shoreline)
+    np.save(save_dir + '/shoreline_entropysaturation_w100_' + case + '.npy', shoreline) #again 500 to 100
     
     #%%
+    # stacks_dict = {}
+    # stacks_dict['SW_20231113_1346_GX010081.npy'] = [2300,7000]
+    # stacks_dict['SW_20231113_1346_GX020081.npy'] = [1800,6500]
+    # stacks_dict['SW_20231113_1346_GX030081.npy'] = [1500,6000]
+    # stacks_dict['SW_20231114_0850_GX010084.npy'] = [4500,10000]
+    # stacks_dict['SW_20231114_0850_GX020084.npy'] = [5000,10000]
+    # stacks_dict['SW_20231114_0850_GX030084.npy'] = [4500,9500]
+    # stacks_dict['SW_20231114_0850_GX040084.npy'] = [3500,8500]
+    # stacks_dict['SW_20231114_0850_GX050084.npy'] = [2000,7500]
+    # stacks_dict['SW_20231114_0850_GX060084.npy'] = [2500,7000]
+
+    #alteration for this test:
+    # stacks_dict = {}
+    # stacks_dict['timestack_0410_101_window1.npy'] = [19,118]
+    # stacks_dict['timestack_0410_101_window2.npy'] = [119,218]
+    # stacks_dict['timestack_0410_101_window3.npy'] = [219,318]
+    # stacks_dict['timestack_0410_101_window4.npy'] = [319,418]
+    # stacks_dict['timestack_0410_101_window5.npy'] = [419,518]
+
     stacks_dict = {}
-    stacks_dict['SW_20231113_1346_GX010081.npy'] = [2300,7000]
-    stacks_dict['SW_20231113_1346_GX020081.npy'] = [1800,6500]
-    stacks_dict['SW_20231113_1346_GX030081.npy'] = [1500,6000]
-    stacks_dict['SW_20231114_0850_GX010084.npy'] = [4500,10000]
-    stacks_dict['SW_20231114_0850_GX020084.npy'] = [5000,10000]
-    stacks_dict['SW_20231114_0850_GX030084.npy'] = [4500,9500]
-    stacks_dict['SW_20231114_0850_GX040084.npy'] = [3500,8500]
-    stacks_dict['SW_20231114_0850_GX050084.npy'] = [2000,7500]
-    stacks_dict['SW_20231114_0850_GX060084.npy'] = [2500,7000]
+    stacks_dict['timestack_0410_101.npy'] = [120,300]
     
     for stack in stacks_dict:
         
         bounds = stacks_dict.get(stack)
-        stack_dir = "C:\Users\katin\OneDrive - Delft University of Technology\MDP\Code_Meye\processed\timestacks"
+        stack_dir = r"C:\Users\katin\MUDE\MDP_CostaRica\Code_meye\processed\timestacks"
         # 'C:/Users/Prins/OneDrive - Delft University of Technology/Desktop/Master_Thesis/Processed/Timestacks'
-        beach = stack[:2]
-        day = stack[3:11]
-        timestack = np.load(os.path.join(stack_dir, beach, stack))
+        # beach = stack[:2]
+        # day = stack[3:11]
+
+        # print(beach)
+        # print(day)
+
+        # day = stack[:18]
+        # timewindow = stack[19:26]
+
+        # print(os.path.join(stack_dir, day, timewindow))
+
+        # day = stack
+        # print(day)
+
+        # timestack = np.load(os.path.join(stack_dir, beach, stack))
+        timestack = np.load(os.path.join(stack_dir, stack))
 
 
 
@@ -235,7 +272,10 @@ if __name__ == "__main__":
         
         shoreline = compute_shoreline_over_windows(reduced_timestack, [500])
         
-        pix2world = np.load('C:/Users/Prins/OneDrive - Delft University of Technology/Desktop/Master_Thesis/Processed/Pixel2World/' + beach + '_' + day + '.npy')
+        # pix2world = np.load('C:/Users/Prins/OneDrive - Delft University of Technology/Desktop/Master_Thesis/Processed/Pixel2World/' + beach + '_' + day + '.npy')
+        # pix2world = np.load(r'C:\Users\katin\MUDE\MDP_CostaRica\Code_meye\processed\Pixel2World' + beach + '_' + day + '.npy')
+        pix2world = np.load(r'C:\Users\katin\MUDE\MDP_CostaRica\Code_meye\processed\Pixel2World' + beach + '_' + day + '.npy') ###what should I load here?
+
         pix2world = pd.DataFrame(pix2world, columns=['pixel_id', 'U', 'V', 'x', 'y', 'z'])
         
         runup_original_stack = shoreline * 10 + bounds[0]
@@ -244,12 +284,15 @@ if __name__ == "__main__":
         shoreline_real = pix2world[['x','y','z']].iloc[runup_original_stack]                 # real xyz value of shoreline position in time
         shoreline_real['pixel'] = runup_original_stack
         
-        start_time = StartTime(stack[:-4])
-        timestamps = [start_time + timedelta(seconds=i * 0.5) for i in range(reduced_timestack.shape[1])]
+        # start_time = StartTime(stack[:-4])
+        start_time = 1728067362
+        timestamps = [start_time + timedelta(seconds=i * 1) for i in range(reduced_timestack.shape[1])] #changed 0.5 to 1, because I used different frequency
         
         shoreline_real['Time'] = timestamps
         
-        save_dir = 'C:/Users/Prins/OneDrive - Delft University of Technology/Desktop/Master_Thesis/Processed/Runup_FromEntropy/_Final'
+        # save_dir = 'C:/Users/Prins/OneDrive - Delft University of Technology/Desktop/Master_Thesis/Processed/Runup_FromEntropy/_Final'
+        save_dir = r'C:\Users\katin\MUDE\MDP_CostaRica\Code_meye\processed\runup_from_entropy\_Final'
+
         save_path = save_dir + '/Entropy_' + stack
         np.save(save_path, shoreline_real)
         
