@@ -4,11 +4,6 @@ Created on Mon Apr 15 12:18:33 2024
 
 @author: Prins
 """
-#here I want to clear all my variables
-# del var_name
-
-
-print("Hello World")
 
 import numpy as np
 from scipy import io
@@ -27,12 +22,16 @@ from scipy.ndimage import gaussian_filter1d
 from matplotlib.colors import ListedColormap
 import matplotlib.gridspec as gridspec
 import pandas as pd
-os.chdir(r'C:\Users\katin\MUDE\MDP_CostaRica\Code_meye') #I think this is where I should put in my script location?
 # from CreationTime import StartTime
 
+#change directory #######################################
+os.chdir(r'C:\Users\katin\MUDE\MDP_CostaRica\Code_meye')
+
+#%% functions
 
 def compute_shoreline_over_windows(reduced_timestack, window_sizes):
     num_rows, total_time = reduced_timestack.shape[:2]
+    print(f'total time is {num_rows}')
     
     # Initialize the result array with zeros
     # It will accumulate results from different window sizes
@@ -58,10 +57,7 @@ def compute_shoreline_over_windows(reduced_timestack, window_sizes):
       
             final_results[i,start:end]  = shoreline_window
     
-
-    
     return final_results
-
 
 def normalize_columns(array):
     # Compute the minimum and maximum values for each column
@@ -174,7 +170,7 @@ if __name__ == "__main__":
     # 'SW_20231114_0850_GX050084.npy'
     
     
-    stack_dir = r"C:\Users\katin\MUDE\MDP_CostaRica\Code_meye\processed\timestacks"
+    stack_dir = r".\processed\timestacks"
     # 'C:/Users/Prins/OneDrive - Delft University of Technology/Desktop/Master_Thesis/Processed/Timestacks'
     # timestack = np.load(os.path.join(stack_dir, beach, stack_name))
     timestack = np.load(os.path.join(stack_dir, stack_name))
@@ -191,28 +187,33 @@ if __name__ == "__main__":
 
     # Choose window for processing
     # timestack_window = timestack[2500:7000]
-    timestack_window = timestack[120:300] #window in SPACE not time
+    timestack_window = timestack[120:330] #window in SPACE not time
     print(timestack_window.shape[0]) 
     print(timestack_window.shape[1])
-    n = 10  # Reduction factor for the first axis
+    n = 1  # Reduction factor for the first axis (og is 10)
     height = timestack_window.shape[0] // n #space
     width = timestack_window.shape[1]  #time
     reshaped = timestack_window.reshape(height, n, width, timestack_window.shape[2])
     reduced_timestack = np.mean(reshaped, axis=1).astype(np.uint8)
+
+    print('test')
+    print(reduced_timestack.shape)
+
     #%%
 
     
     case = 'Normalized_entropysaturation'
-    save_dir = r"C:\Users\katin\MUDE\MDP_CostaRica\Code_meye\processed\runup_from_entropy\normalize_col"
+    save_dir = r".\processed\runup_from_entropy\normalize_col"
     # 'C:/Users/Prins/OneDrive - Delft University of Technology/Desktop/Master_Thesis/Processed/Runup_FromEntropy/Normalize_col'
 
     
     #%%
+    timewindow = 20 # original was 100
     
-    shoreline = compute_shoreline_over_windows(reduced_timestack, [100]) #for this test I changed the window size to 100 instead of 500
+    shoreline = compute_shoreline_over_windows(reduced_timestack, [timewindow]) #for this test I changed the window size to 100 instead of 500
     
     #%%
-    np.save(save_dir + '/shoreline_entropysaturation_w100_' + case + '.npy', shoreline) #again 500 to 100
+    np.save(save_dir + '/shoreline_entropysaturation_'+ f'{timewindow}' + case + '.npy', shoreline) #again 500 to 100
     
     #%%
     # stacks_dict = {}
@@ -235,12 +236,12 @@ if __name__ == "__main__":
     # stacks_dict['timestack_0410_101_window5.npy'] = [419,518]
 
     stacks_dict = {}
-    stacks_dict['timestack_0410_101.npy'] = [120,300]
+    stacks_dict['timestack_0410_101.npy'] = [120,330]
     
     for stack in stacks_dict:
         
         bounds = stacks_dict.get(stack)
-        stack_dir = r"C:\Users\katin\MUDE\MDP_CostaRica\Code_meye\processed\timestacks"
+        stack_dir = r".\processed\timestacks"
         # 'C:/Users/Prins/OneDrive - Delft University of Technology/Desktop/Master_Thesis/Processed/Timestacks'
         # beach = stack[:2]
         # day = stack[3:11]
@@ -270,13 +271,14 @@ if __name__ == "__main__":
         reduced_timestack = np.mean(reshaped, axis=1).astype(np.uint8)
         
         
-        shoreline = compute_shoreline_over_windows(reduced_timestack, [500])
+        shoreline = compute_shoreline_over_windows(reduced_timestack, [timewindow])
         
         # pix2world = np.load('C:/Users/Prins/OneDrive - Delft University of Technology/Desktop/Master_Thesis/Processed/Pixel2World/' + beach + '_' + day + '.npy')
-        # pix2world = np.load(r'C:\Users\katin\MUDE\MDP_CostaRica\Code_meye\processed\Pixel2World' + beach + '_' + day + '.npy')
-        pix2world = np.load(r'C:\Users\katin\MUDE\MDP_CostaRica\Code_meye\processed\Pixel2World' + beach + '_' + day + '.npy') ###what should I load here?
+        pix2world = np.load(r'.\processed\Pixel2World\\' + 'pix2world_0410_101.npy') ###what should I load here?
 
-        pix2world = pd.DataFrame(pix2world, columns=['pixel_id', 'U', 'V', 'x', 'y', 'z'])
+        # pix2world = pd.DataFrame(pix2world, columns=['pixel_id', 'U', 'V', 'x', 'y', 'z'])
+        pix2world = pd.DataFrame(pix2world, columns=['x', 'y', 'z'])
+
         
         runup_original_stack = shoreline * 10 + bounds[0]
         runup_original_stack = runup_original_stack.squeeze()
@@ -284,15 +286,23 @@ if __name__ == "__main__":
         shoreline_real = pix2world[['x','y','z']].iloc[runup_original_stack]                 # real xyz value of shoreline position in time
         shoreline_real['pixel'] = runup_original_stack
         
-        # start_time = StartTime(stack[:-4])
+        # Given Unix timestamp (epoch time)
         start_time = 1728067362
+
+        # Convert the Unix timestamp to a datetime object
+        start_time = datetime.fromtimestamp(start_time)
+        print(start_time)
+
+
+        # # start_time = StartTime(stack[:-4])
+        # start_time = 1728067362
         timestamps = [start_time + timedelta(seconds=i * 1) for i in range(reduced_timestack.shape[1])] #changed 0.5 to 1, because I used different frequency
         
         shoreline_real['Time'] = timestamps
         
         # save_dir = 'C:/Users/Prins/OneDrive - Delft University of Technology/Desktop/Master_Thesis/Processed/Runup_FromEntropy/_Final'
-        save_dir = r'C:\Users\katin\MUDE\MDP_CostaRica\Code_meye\processed\runup_from_entropy\_Final'
+        save_dir = r'.\processed\runup_from_entropy\_Final'
 
-        save_path = save_dir + '/Entropy_' + stack
+        save_path = save_dir + '/Entropy_' + stack 
         np.save(save_path, shoreline_real)
         
