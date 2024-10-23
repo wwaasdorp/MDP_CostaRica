@@ -25,11 +25,12 @@ os.chdir(r'C:\Users\katin\MUDE\MDP_CostaRica\Code_meye')
 
 def compute_shoreline_over_windows(reduced_timestack, window_sizes):
     num_rows, total_time = reduced_timestack.shape[:2]
-    print(f'total time is {num_rows}')
+    print(f'total time is {total_time}, num rows is {num_rows}')
     
     # Initialize the result array with zeros
     # It will accumulate results from different window sizes
     final_results = np.zeros((len(window_sizes), total_time))
+    WD_results = np.zeros((len(window_sizes), total_time))
     
     # Process each window size
     for i,window_size in enumerate(window_sizes):
@@ -50,6 +51,7 @@ def compute_shoreline_over_windows(reduced_timestack, window_sizes):
             # Place the computed shoreline in the corresponding positions
       
             final_results[i,start:end]  = shoreline_window
+            WD_results[i,start:end] = WD_windo
     
     return final_results
 
@@ -128,7 +130,7 @@ def Shoreline_EntropySaturation(stack):
     # Compute runup line
     runup = stack.shape[0] - np.sum(binary_entropy_mWD, axis=0)
     # Smooth runup
-    runup = gaussian_filter1d(runup, 2.5) #was originally 2
+    runup = gaussian_filter1d(runup, 2) #was originally 2
 
     
 # =============================================================================
@@ -158,7 +160,7 @@ def Shoreline_EntropySaturation(stack):
 
 if __name__ == "__main__":
     
-    stack_name = 'timestack_0410_101.npy'
+    stack_name = 'timestack_0410_102.npy'
     stack_dir = r".\processed\timestacks"
     timestack = np.load(os.path.join(stack_dir, stack_name))
 
@@ -172,20 +174,26 @@ if __name__ == "__main__":
     #%%
     reduced_timestack = timestack[100:300]
 
+    # Plot entire timestack to choose appropriate window
+    plt.figure(figsize=(10,6))
+    plt.imshow(reduced_timestack)
+
+    plt.savefig('reduced_output_figure.png')  # Save the figure as a PNG file
+
     #%%
 
     case = 'Normalized_entropysaturation'
-    save_dir = r".\processed\runup_from_entropy\normalize_col"
+    save_dir = r".\processed\runup_from_entropy\normalize_col\\"
     
-    timewindow = 518 # original was 500
+    timewindow = 500 # original was 500
     
     shoreline = compute_shoreline_over_windows(reduced_timestack, [timewindow]) #for this test I changed the window size to 100 instead of 500
     
     #%%
-    np.save(save_dir + '/shoreline_entropysaturation_'+ f'{timewindow}' + case + '.npy', shoreline) #again 500 to 100
+    np.save(save_dir + case + '.npy', shoreline) #again 500 to 100
 
     stacks_dict = {}
-    stacks_dict['timestack_0410_101.npy'] = [100,300]
+    stacks_dict['timestack_0410_102.npy'] = [100,300]
     
     for stack in stacks_dict:
         
@@ -195,10 +203,10 @@ if __name__ == "__main__":
 
         reduced_timestack = timestack[bounds[0]:bounds[1]]
                 
-        shoreline = compute_shoreline_over_windows(timestack, [timewindow])
+        shoreline = compute_shoreline_over_windows(reduced_timestack, [timewindow])
         
         # pix2world = np.load('C:/Users/Prins/OneDrive - Delft University of Technology/Desktop/Master_Thesis/Processed/Pixel2World/' + beach + '_' + day + '.npy')
-        pix2world = np.load(r'.\processed\Pixel2World\\' + 'pix2world_0410_101.npy') ###what should I load here?
+        pix2world = np.load(r'.\processed\Pixel2World\\' + 'pix2world_0410_102.npy') ###what should I load here?
 
         # pix2world = pd.DataFrame(pix2world, columns=['pixel_id', 'U', 'V', 'x', 'y', 'z'])
         pix2world = pd.DataFrame(pix2world, columns=['x', 'y', 'z'])
